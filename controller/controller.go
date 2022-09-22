@@ -54,3 +54,13 @@ func GetCustomCommandResult(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write([]byte(result))
 }
+
+func GetLicenseForContainer(w http.ResponseWriter, r *http.Request) {
+	log.Println("GetLicenseForContainer GET called")
+	w.Header().Set("Content-Type", "application/json")
+	vars := mux.Vars(r)
+	containerName := vars["containerName"]
+	license := dockerHost.GetLicenseForContainer(containerName)
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write([]byte(license))
+}

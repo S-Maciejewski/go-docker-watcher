@@ -9,8 +9,10 @@ import (
 
 func setupRouter(router *mux.Router) {
 	router.Methods("GET").Path("/version/{imageName}").HandlerFunc(controller.GetImageVersions)
-	router.Methods("GET").Path("/ls/{containerName}").HandlerFunc(controller.GetLsForContainer)
 	router.Methods("GET").Path("/cmd/{containerName}").HandlerFunc(controller.GetCustomCommandResult)
+
+	router.Methods("GET").Path("/ls/{containerName}").HandlerFunc(controller.GetLsForContainer)
+	router.Methods("GET").Path("/license/{containerName}").HandlerFunc(controller.GetLicenseForContainer)
 }
 
 func main() {
