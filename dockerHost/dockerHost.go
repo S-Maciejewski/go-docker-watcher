@@ -10,16 +10,21 @@ import (
 	"github.com/docker/docker/client"
 )
 
-func GetImages() []string {
+func GetImageVersions(imageName string) []string {
 	dockerClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		log.Fatalf("Unable to get new docker client: %v", err)
-		return nil
+		return []string{}
 	}
+	images := []string{}
 	containers := getContainers(dockerClient)
-	var images []string
 	for _, container := range containers {
-		images = append(images, container.Image)
+		if strings.Contains(container.Image, imageName) {
+			images = append(images, container.Image)
+		}
+	}
+	if len(images) == 0 {
+		log.Printf("Image not found: %v", imageName)
 	}
 	return images
 }
