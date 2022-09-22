@@ -33,3 +33,24 @@ func GetImageVersions(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write(jsonResponse)
 }
+
+func GetCustomCommandResult(w http.ResponseWriter, r *http.Request) {
+	log.Println("GetCustomCommandResult GET called")
+	w.Header().Set("Content-Type", "application/json")
+
+	vars := mux.Vars(r)
+	containerName := vars["containerName"]
+	body := r.Body
+	defer body.Close()
+	var command []string
+	err := json.NewDecoder(body).Decode(&command)
+	if err != nil {
+		log.Println("Unable to decode json", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	result := dockerHost.GetCustomCommandResult(containerName, command)
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write([]byte(result))
+}

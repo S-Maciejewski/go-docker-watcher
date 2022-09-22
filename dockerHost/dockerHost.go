@@ -16,7 +16,7 @@ func GetImageVersions(imageName string) []string {
 		log.Fatalf("Unable to get new docker client: %v", err)
 		return []string{}
 	}
-	images := []string{}
+	var images []string
 	containers := getContainers(dockerClient)
 	for _, container := range containers {
 		if strings.Contains(container.Image, imageName) {
@@ -48,11 +48,29 @@ func GetLsForContainer(containerName string) string {
 	for _, container := range containers {
 		log.Println("Container: ", container.Names, " Image: ", container.Image)
 		if strings.Contains(container.Names[0], containerName) {
-			log.Println("Container found")
+			log.Println("Container found", container.Names[0])
 			return getExecResultForContainer(dockerClient, container.ID, []string{"ls", "-l"})
 		}
 	}
-	log.Fatalf("Container not found: %v", containerName)
+	log.Printf("Container not found: %v", containerName)
+	return ""
+}
+
+func GetCustomCommandResult(containerName string, command []string) string {
+	dockerClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		log.Fatalf("Unable to get new docker client: %v", err)
+		return ""
+	}
+	containers := getContainers(dockerClient)
+	for _, container := range containers {
+		log.Println("Container: ", container.Names, " Image: ", container.Image)
+		if strings.Contains(container.Names[0], containerName) {
+			log.Println("Container found", container.Names[0])
+			return getExecResultForContainer(dockerClient, container.ID, command)
+		}
+	}
+	log.Printf("Container not found: %v", containerName)
 	return ""
 }
 
